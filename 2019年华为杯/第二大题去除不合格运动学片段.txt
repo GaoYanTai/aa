@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+@author: gyt
+"""
+import pandas
+import numpy as np
+import math
+
+def Open_file(number):
+    openfile_name="f3"+str(number)+".csv"
+    food_info=pandas.read_csv(openfile_name, low_memory=False)
+    train_data = np.array(food_info)
+    return train_data
+def New_file(number):
+    file_name="ff3"+str(number)+".csv"
+    file1=open(file_name,'w',encoding='utf-8-sig')
+    return file1
+
+count_num=0
+ff=0
+qq=0
+for x in range(0,890):
+    sh=Open_file(x)
+    for b in range(sh.shape[0]):
+        qq+=1
+    total={}
+    
+    for lie in [15,16]:
+        total[lie]=sum([sh[s][lie] for s in range(sh.shape[0])])
+    
+    if total[15]==sh.shape[0] and total[16]==0:
+        ne=New_file(count_num)
+        ne.write("时间,GPS车速,X轴加速度,Y轴加速度,Z轴加速度,经度,纬度,发动机转速,\
+            扭矩百分比,瞬时油耗,油门踏板开度,空燃比,发动机负荷百分比,进气流量,\
+            速度正常为1,加速度正常为1,长期停车为1")
+        ne.write("\n")
+        
+        for b in range(sh.shape[0]):
+            ff+=1
+            row_0=sh[b]
+            row_1=",".join(str(i) for i in row_0)
+            ne.write(row_1)
+            ne.write("\n")
+        print(count_num)
+        count_num+=1
+
+print("okk")
+print(ff)
+print(qq)

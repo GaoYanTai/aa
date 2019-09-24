@@ -1,0 +1,88 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+@author: gyt
+"""
+import pandas
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+
+def Open_file(number):
+    openfile_name="i3"+str(number)+".csv"
+    food_info=pandas.read_csv(openfile_name, low_memory=False)
+    train_data = np.array(food_info)
+    return train_data
+
+def New_file(number):
+    file_name="p3"+str(number)+".csv"
+    file1=open(file_name,'w',encoding='utf-8-sig')
+    return file1
+
+total=0
+ne_num=0
+ge=0
+base_num=1.11*(10**5)
+
+for x in range(0,615):
+    sh=Open_file(x)
+    if sh.shape[0]>180:   #有180条以上的记录
+        ge+=sh.shape[0]
+        print("**",ge)
+        print(ne_num,x,"#####\n")
+        ne=New_file(ne_num)
+        ne.write("时间,GPS车速,X轴加速度,Y轴加速度,Z轴加速度,经度\
+	,纬度,发动机转速,扭矩百分比,瞬时油耗,油门踏板开度,空燃比,\
+	发动机负荷百分比,进气流量,速度正常为1,加速度正常为1,长期停车为1")
+        ne.write("\n")
+        ne_num+=1
+
+        for i in range(sh.shape[0]-1): 
+            total+=1
+            w_num=sh[i+1][6]-sh[i][6]
+            j_num=sh[i+1][5]-sh[i][5]
+            Dw=base_num*w_num
+            Dj=base_num*j_num*(math.cos(sh[i+1][6]/180*math.pi))
+            Di=((Dw**2)+(Dj**2))**0.5
+            #加速度
+            max_num=130/(3.6*7)
+            a=(sh[i+1][1]-sh[i][1])/3.6
+            if Di>31 and sh[i][1]==0:
+                row_0=sh[i]
+                row_1=",".join(str(i) for i in row_0)
+                ne.write(row_1)
+                ne.write(",0")
+                if a>-8 and a<max_num:
+                    ne.write(",1")
+                    if sh[i][1]==0 and sh[i][7]<=550:
+                        ne.write(",1\n")
+                    else:
+                        ne.write(",0\n")
+                else:
+                    ne.write(",0")
+                    if sh[i][1]==0 and sh[i][7]<=550:
+                        ne.write(",1\n")
+                    else:
+                        ne.write(",0\n")
+                    print("0")
+            else:
+                row_0=sh[i]
+                row_1=",".join(str(i) for i in row_0)
+                ne.write(row_1)
+                ne.write(",1")
+                if a>-8 and a<max_num:
+                    ne.write(",1")
+                    if sh[i][1]==0 and sh[i][7]<=550:
+                        ne.write(",1\n")
+                    else:
+                        ne.write(",0\n")
+                else:
+                    ne.write(",0")
+                    if sh[i][1]==0 and sh[i][7]<=550:
+                        ne.write(",1\n")
+                    else:
+                        ne.write(",0\n")
+                    print("0")
+    

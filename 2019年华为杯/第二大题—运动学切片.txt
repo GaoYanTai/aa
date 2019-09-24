@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+@author: gyt
+"""
+
+import pandas
+import numpy as np
+import math
+
+def Open_file(number):
+    openfile_name="b1"+str(number)+".csv"
+    food_info=pandas.read_csv(openfile_name, low_memory=False)
+    train_data = np.array(food_info)
+    return train_data
+
+def New_file(number):
+    file_name="f3"+str(number)+".csv"
+    file1=open(file_name,'w',encoding='utf-8-sig')
+    return file1
+
+ge=0
+count_num=0
+
+for x in range(0,1120):
+    sh=Open_file(x)
+    print(sh[1])
+    a={}
+    i=0
+    for b in range(sh.shape[0]):
+        qq+=1
+    norm_num=0
+
+    while (i<sh.shape[0]):                # 遍历每一行
+        if sh[i][1]==0 :      # 若第i个数为0，则遍历后面，否则加1
+            a[i]=0
+            info=0
+            for j in range(i+1,sh.shape[0]):
+                a[i]+=1
+                if sh[j][1]!=0:
+                    for h in range(j+1,sh.shape[0]):
+                        a[i]+=1
+                        if sh[h][1]== 0:
+                            info=1
+                            #print(sh[h][1])
+                            break
+                        else:
+                            continue
+                    break
+                else:
+                    continue
+                  
+            if info==1:      
+                ne=New_file(ge)
+                ge+=1
+                ne.write("时间,GPS车速,X轴加速度,Y轴加速度,Z轴加速度,经度,纬度,发动机转速,\
+                        扭矩百分比,瞬时油耗,油门踏板开度,空燃比,发动机负荷百分比,进气流量,\
+                        速度正常为1,加速度正常为1,长期停车为1")
+                ne.write("\n")
+
+                for b in range(i,i+a[i]+1):
+                    row_0=sh[b]
+                    row_1=",".join(str(i) for i in row_0)
+                    ne.write(row_1)
+                    ne.write("\n")
+
+                print(count_num)          
+                count_num+=1
+                i=i+a[i]
+            else:
+                i=sh.shape[0]
+        else:
+            i+=1

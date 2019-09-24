@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+@author: gyt
+"""
+
+import pandas
+import numpy as np
+import math
+
+def Open_file(number):
+    openfile_name="p3"+str(number)+".csv"
+    food_info=pandas.read_csv(openfile_name, low_memory=False)
+    train_data = np.array(food_info)
+    return train_data
+
+def New_file(number):
+    file_name="q3"+str(number)+".csv"
+    file1=open(file_name,'w',encoding='utf-8-sig')
+    return file1
+
+for x in range(0,246):        
+    sh=Open_file(x)
+    a={}
+    average={}
+    ne=New_file(x)
+    for lie in [2,3,4,5,6,7,8,9,11,12,13]:
+        total=0
+        n_num=0
+        for j in range(0,sh.shape[0]):
+            if sh[j][1]==0:
+                n_num+=1
+                total+=sh[j][lie]  
+        if n_num!=0:
+            average[lie]=total/n_num
+    ne.write("时间,GPS车速,X轴加速度,Y轴加速度,Z轴加速度,经度,纬度,发动机转速,\
+            扭矩百分比,瞬时油耗,油门踏板开度,空燃比,发动机负荷百分比,进气流量,\
+            速度正常为1,加速度正常为1,长期停车为1")
+    ne.write("\n")
+    i=0
+    while (i<sh.shape[0]):
+        if sh[i][1]<10 :
+            a[i]=0
+            for j in range(0,sh.shape[0]-i):
+                if sh[i+j][1]<10:
+                    a[i]+=1
+                else:
+                    break
+            ai=a[i]
+            if a[i]>180: 
+                ff+=ai
+                print(i,i+ai)
+                for b in range(i,i+ai):
+                    And_str=str(sh[b][0])+",0,"+str(average.get(2))+","+str(average.get(3))+","+\
+                            str(average.get(4))+","+str(average.get(5))+","+str(average.get(6))+","+\
+                            str(average.get(7))+","+str(average.get(8))+","+str(average.get(9))+","+\
+                            "0,"+str(average.get(11))+","+str(average.get(12))+","+str(average.get(13))+","+\
+                            str(sh[b][14])+","+str(sh[b][15])+","+str(sh[b][16])+"\n"  
+                    ne.write(And_str)
+            else:
+                print(i,i+ai)
+                for b in range(i,i+ai):
+                    row_0=sh[b]
+                    row_1=",".join(str(i) for i in row_0)
+                    ne.write(row_1)
+                    ne.write("\n")
+            i=i+ai
+        else:
+            row_0=sh[i]
+            row_1=",".join(str(i) for i in row_0)
+            ne.write(row_1) 
+            ne.write("\n")
+            i+=1

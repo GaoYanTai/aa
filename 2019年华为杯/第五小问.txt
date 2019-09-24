@@ -1,0 +1,81 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+       一般认为怠速时间超过180秒为异常情况，怠速最长时间可按180秒处理。
+即怠速超过180秒的，从前开始去掉，使连续怠速时间不超过180
+
+@author: gyt
+"""
+
+import pandas
+import numpy as np
+import math
+
+# 定义打开文件函数，读取文件，并转换为数组
+def Open_file(number):
+    openfile_name="q1"+str(number)+".csv"
+    food_info=pandas.read_csv(openfile_name, low_memory=False)
+    train_data = np.array(food_info)
+
+    return train_data
+
+# 定义带参数的函数，用于新建输出文件
+def New_file(number):
+    file_name="b1"+str(number)+".csv"
+    file1=open(file_name,'w',encoding='utf-8-sig')
+
+    return file1
+
+#循环访问每个子文件
+for x in range(0,304):
+    sh=Open_file(x)
+
+    a={}                    # 定义字典类型变量，用于
+
+    ne=New_file(x)
+    ne.write("时间,GPS车速,X轴加速度,Y轴加速度,Z轴加速度,经度,纬度,发动机转速,\
+            	扭矩百分比,瞬时油耗,油门踏板开度,空燃比,发动机负荷百分比,进气流量,\
+            	速度正常为1,加速度正常为1,长期停车为1")
+    ne.write("\n")
+    
+    i=0             #  定义while循环的循环变量，并初始化为0
+    
+    #  循环遍历文件中的每一条记录
+    while (i<sh.shape[0]):
+        if sh[i][1]==0 :                  #  若速度为零，则进入if语句
+
+            a[i]=0        #  遇到第一个零则，将i作为字典的键，并将该键对应的值初始化为0
+            
+            #继续遍历下一个数
+            for j in range(0,sh.shape[0]-i):  
+                if sh[i+j][1]<10:     # 验证是否是连续的怠速状态，若是则连续怠速时长加1
+                    a[i]+=1               
+                else:                # 否则跳出本循环
+                    break
+            
+            ai=a[i]             # ai记录怠速时长
+
+            if a[i]>180:     #怠速时长超过180秒
+	# 将从i+ai-179到ai的180条记录写入新文件            
+                for b in range(i+ai-179,ai):       
+                    row_0=sh[b]            # 读取整行数据
+                    row_1=",".join(str(i) for i in row_0)        # 将数据转换为用逗号分隔的字符串
+                    ne.write(row_1)          
+                    ne.write("\n")
+            else:                 #怠速时长不足180秒
+                 #将不足180秒的ai条记录写入文件
+                for b in range(i,i+ai):
+                    row_0=sh[b]
+                    row_1=",".join(str(i) for i in row_0)
+                    ne.write(row_1)
+                    ne.write("\n")
+            i=i+ai         #继续访问同一文件时，从ai条文件的下一跳开始
+        else:           #如果速度不为零，则直接将该条记录写入新文件
+            row_0=sh[i]
+            row_1=",".join(str(i) for i in row_0)
+            ne.write(row_1) 
+            ne.write("\n")
+            i+=1   #访问吓一跳记录
+
+print("所有文件已执行完毕!")

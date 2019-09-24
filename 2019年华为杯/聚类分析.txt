@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+@author: gyt
+"""
+import numpy as np
+import pandas
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import random   #导入random
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
+#plt.rcParams['axes.unicode_minus']
+
+#从磁盘读取城市经纬度数据
+X = []
+
+def Open_file(number):
+    openfile_name=number
+    food_info=pandas.read_csv(openfile_name, low_memory=False)
+    train_data = np.array(food_info)
+    return train_data
+X =Open_file('PP1.csv')
+
+#绘制数据分布图
+estimator = KMeans(n_clusters=3)#构造聚类器
+estimator.fit(X)#聚类
+label_pred = estimator.labels_ #获取聚类标签
+
+#绘制k-means结果
+x0 = X[label_pred == 0]
+x1 = X[label_pred == 1]
+x2 = X[label_pred == 2]
+plt.scatter(x0[:, 0], x0[:, 1], c = "red",marker='o', label='类别1')
+plt.scatter(x1[:, 0], x1[:, 1], c = "green", marker='*', label='类别2')
+plt.scatter(x2[:, 0], x2[:, 1], c = "blue", marker='+', label='类别3')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend(loc=2)
+plt.show()

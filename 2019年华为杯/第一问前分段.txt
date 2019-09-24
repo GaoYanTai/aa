@@ -1,0 +1,54 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 19 14:44:29 2019
+
+@author: gyt
+"""
+
+import xlrd
+import time
+
+from datetime import datetime
+from datetime import timedelta
+
+def New_file(number):
+    file_name="i1"+str(number)+".csv"
+    file1=open(file_name,'w',encoding='UTF-8')
+    return file1
+
+workbook = xlrd.open_workbook('y1.xlsx')
+sheetbooksheet = workbook.sheet_by_index(0)        
+s=sheetbooksheet
+
+file=open("i10.csv",'w',encoding='UTF-8')
+
+ci=1
+for i in range(1,185726):
+    cell_1=sheetbooksheet.cell_value(i,0)
+    j=i+1;
+    cell_2=sheetbooksheet.cell_value(j,0)
+    a = datetime.strptime(cell_1,'%Y/%m/%d %H:%M:%S.%f.')
+    b = datetime.strptime(cell_2,'%Y/%m/%d %H:%M:%S.%f.')
+    c=((b - a).total_seconds())
+    row_0 = sheetbooksheet.row_values(i)
+    row_1=",".join(str(i) for i in row_0)
+    
+    if c==1:
+        file.write(row_1+"\n")
+    elif c==2:
+        file.write(row_1+"\n")
+        b = a + timedelta(seconds = 1)
+        b= time.strptime(str(b),'%Y-%m-%d %H:%M:%S')
+        c = time.strftime('%Y/%m/%d %H:%M:%S',b) 
+        file.write(str(c)+".000.")
+        for x in range(1,14):
+            cell_1=s.cell_value(i,x)
+            cell_2=s.cell_value(j,x)
+            cell=(cell_1+cell_2)/2
+            file.write(","+str(x))
+        file.write("\n")
+    else:
+        file.write(row_1+"\n")
+        file.close()
+        file=New_file(ci)
+        ci+=1
